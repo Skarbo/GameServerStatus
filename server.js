@@ -160,7 +160,7 @@ app.listen(port, function () {
 	console.log('Example app listening on port ' + port + '!');
 });
 
-schedule.scheduleJob("*/5 * * * *", function() {
+schedule.scheduleJob("*/2 * * * *", function() {
 	updateGameServers(gameServers);
 });
 
