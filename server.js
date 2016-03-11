@@ -6,6 +6,7 @@ var express = require('express');
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser');
 var schedule = require('node-schedule');
+var Promise = require('promise');
 
 var port = process.env.PORT || 3500;
 var gameServers = [],
@@ -22,13 +23,6 @@ var hbs = exphbs.create({
         			return games[i].name;
         		}
         	}
-        },
-        getGamesSelected: function(gameType) {
-        	console.log("getGamesSelected", gameType);
-        	return games.map(function(game) {
-        		game.selected = game.type === gameType;
-        		return game;
-        	});
         }
     }
 });
@@ -58,8 +52,6 @@ app.get('/', function (req, res) {
 });
 
 app.post('/', function (req, res) {
-	console.log("SERVERS", req.body);
-
 	var servers = [],
 		types = req.body.type,
 		hosts = req.body.host,
@@ -118,15 +110,12 @@ function updateAndSaveGameServers(gameServers, callback) {
 }
 
 function updateGameServers(gameServers, callback) {
-	console.log("Update game servers", gameServers);
 	Promise.all(gameServers.map(function(gameServer) {
 		return queryGameServerPromise(gameServer.type, gameServer.host, gameServer.port);
 	})).then(function(gameServerQueries) {		
 		gameServersStatus = gameServerQueries.filter(function(gameServerQuery) {
 			return !!gameServerQuery;
 		});
-
-		console.log("Game servers status", gameServersStatus);
 
 		if (callback) {
 			callback(gameServersStatus);
@@ -157,7 +146,7 @@ function getGames() {
 games = getGames();
 
 app.listen(port, function () {
-	console.log('Example app listening on port ' + port + '!');
+	console.log('App listening on port ' + port + '!');
 });
 
 schedule.scheduleJob("*/2 * * * *", function() {
