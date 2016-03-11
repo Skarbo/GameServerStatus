@@ -1,0 +1,120 @@
+<h1>Game Server Status</h1>
+
+<main>
+<table border="1">
+<thead>
+	<tr>
+		<th>Game</th>
+		<th>Name</th>		
+		<th>IP</th>
+		<th>Map</th>
+		<th colspan="2">Players</th>
+	</tr>
+</thead>
+<tbody>
+{{#each serversStatus}}
+	<tr>
+		<td>
+			<a target="_blank" href="http://store.steampowered.com/app/{{raw.steamappid}}/"><strong>{{query.pretty}}</strong></a>
+		</td>
+		<td>
+			{{name}}
+		</td>
+		<td>
+			<a href='steam: "-applaunch {{raw.steamappid}} +connect {{query.host}}:{{query.port}}"'>{{query.host}}:{{query.port}}</a>
+		</td>
+		<td>
+			{{map}}
+		</td>
+		<td>
+			{{raw.numplayers}} / {{maxplayers}}
+		</td>
+		<td>
+			<select multiple="true">
+			{{#each players}}			
+				<option>{{name}}</option>								
+			{{/each}}
+			</select>
+		</td>
+	</tr>	
+{{/each}}
+</tbody>
+</table>
+</main>
+
+<br />
+<br />
+
+<form method="POST" action="">
+	<fieldset>
+    <legend>Servers</legend>
+
+    <table>
+    	<tbody>
+    		{{#each servers}}
+    		<tr>
+    			<td>
+    				<select data-value="{{type}}" name="type">
+    					{{#each @root.games}}
+    					<option value="{{type}}">{{name}}</option>
+    					{{/each}}
+    				</select>
+    			</td>
+    			<td>
+    				<input value="{{host}}" type="text" name="host[]" placeholder="Host">
+    			</td>
+    			<td>
+    				<input value="{{port}}" type="number" name="port[]" placeholder="Port">
+    			</td>
+    			<td>
+    				<button type="button" onclick="removeServer({{@index}})">Remove</button>
+    			</td>
+    		</tr>
+    		{{/each}}
+    	</tbody>
+    	<tfoot>
+    		<tr>
+    			<th colspan="3">New server</th>
+    		</tr>
+    		<tr>
+    			<td>
+    				<select name="type">
+    					{{#each games}}
+    					<option value="{{type}}">{{name}}</option>
+    					{{/each}}
+    				</select>
+    			</td>
+    			<td>
+    				<input type="text" name="host[]" placeholder="Host">
+    			</td>
+    			<td>
+    				<input type="number" name="port[]" placeholder="Port">
+    			</td>
+    		</tr>
+    	</tfoot>
+    </table>
+
+    <br />
+    <button type="submit">Save</button>
+    </fieldset>
+</form>
+
+<script type="text/javascript">
+	var selects = document.querySelectorAll("select[data-value]");
+
+	for(var i = 0; i < selects.length; i++) {
+		for(var j = 0; j < selects[i].children.length; j++) {
+			if (selects[i].getAttribute("data-value") === selects[i].children[j].value) {
+				selects[i].children[j].selected = true;
+			}
+		}	
+	}
+
+	function removeServer(index) {
+		var serverRow = document.querySelectorAll("form table tbody tr")[index];
+
+		if (serverRow) {
+			serverRow.parentNode.removeChild(serverRow);
+		}
+	}
+</script>
